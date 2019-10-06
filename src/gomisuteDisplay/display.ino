@@ -22,21 +22,25 @@ void printPt16(const char* buf,uint16_t x, uint16_t y, int color){
 }
 
 void printMainText(const char* buf,int color,int index){
+  if(buf == NULL) return;
   if(index >= SUB_INDEX_MAX)  return;
   printPt16(buf,ORGPOINTX + (MAIN_OFFSETX * index),MAIN_TEXT_ORGPOINTY,color);
 }
 
 void printMainPicture(const char* fileName,int index){
+  if(fileName == NULL) return;
   if(index >= MAIN_INDEX_MAX)  return;
   M5.Lcd.drawJpgFile(SD, fileName,ORGPOINTX + (MAIN_OFFSETX * index),MAIN_PICTURE_ORGPOINTY);
 }
 
 void printSubText(const char* buf,int color,int index){
+  if(buf == NULL) return;
   if(index >= SUB_INDEX_MAX)  return;
   printPt16(buf,17/* 即値オフセット*/ + ORGPOINTX + (SUB_OFFSETX * index),SUB_TEXT_ORGPOINTY,color);
 }
 
 void printSubPicture(const char* fileName,int index){
+  if(fileName == NULL) return;
   if(index >= SUB_INDEX_MAX)  return;
   M5.Lcd.drawJpgFile(SD, fileName,ORGPOINTX + (SUB_OFFSETX * index),SUB_PICTURE_ORGPOINTY);
 }
