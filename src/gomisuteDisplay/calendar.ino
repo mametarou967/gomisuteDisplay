@@ -110,3 +110,33 @@ bool loadGomiCalendarFromCSV(struct GomiCalendar *gomiCalendar,const char* fileN
     if(endOfFileFlg == true) break;
   }
 }
+
+bool getTermGomisuteCalendar(struct GomiCalendar *gomiCalendar,struct GomiCalendar *gomiMasterCalendar,const char *baseDayString,int numberOfRecords){
+  int baseIndex = -1;
+  bool result = false;
+
+  // baseIndexを探す
+  Serial.printf("target[%s]",baseDayString);
+  // for(int index = 0;index < DATA_RECORD_NUM;index++){
+  for(int index = 188;index < 192;index++){
+    printf("%s\n",(gomiMasterCalendar + index)->day);
+    if(memcmp((gomiMasterCalendar + index)->day,baseDayString,strlen(baseDayString)) == 0){
+      baseIndex = index;
+      printf("good\n");
+      break;
+    }
+  }
+
+  if(baseIndex != -1){
+    // baseIndexからコピーする
+    Serial.printf("copy size[%d]",sizeof(struct GomiCalendar));
+    for(int index = 0;index < numberOfRecords;index++){
+      if(index >= DATA_RECORD_NUM) break;
+      Serial.printf("copy do[%d]",index);
+      memcpy((gomiCalendar + index),(gomiMasterCalendar + baseIndex + index),sizeof(struct GomiCalendar));
+    }
+    result = true;
+  }
+
+  return result;
+}
