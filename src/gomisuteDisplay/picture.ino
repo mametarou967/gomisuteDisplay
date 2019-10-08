@@ -11,16 +11,16 @@ char *getFilePath(enum GomiShubetsu gomiShubetsu,enum FileSize fizeSize){
     break;
   case FUNEN:
     if(fizeSize == S50X50){
-      filePath = "/pic50x50/moeru.jpg";
+      filePath = "/pic50x50/moenai.jpg";
     }else{
-      filePath = "/pic150x150/moeru.jpg";
+      filePath = "/pic150x150/moenai.jpg";
     }
     break;
   case HOKAPURA:
     if(fizeSize == S50X50){
-      filePath = "/pic50x50/moenai.jpg";
+      filePath = "/pic50x50/plastic.jpg";
     }else{
-      filePath = "/pic150x150/moenai.jpg";
+      filePath = "/pic150x150/plastic.jpg";
     }
     break;
   case SHIGEN:

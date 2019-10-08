@@ -53,6 +53,23 @@ enum DayOfWeek dayOfWeekStringToEnum(const char* dayOfWeekChar){
   return dayOfWeek;
 }
 
+const char * dayOfWeekEnumToString(enum DayOfWeek dayOfWeek){
+  char *dayOfWeekString = NULL;
+
+  switch(dayOfWeek){
+  case SUNDAY: dayOfWeekString = "日"; break;
+  case MONDAY: dayOfWeekString = "月"; break;
+  case TUESDAY: dayOfWeekString = "火"; break;
+  case WEDNESDAY: dayOfWeekString = "水"; break;
+  case THURSDAY: dayOfWeekString = "木"; break;
+  case FRIDAY: dayOfWeekString = "金"; break;
+  case SATURDAY: dayOfWeekString = "土"; break;
+  default: /* do nothing */ break;
+  }
+
+  return dayOfWeekString;
+}
+
 bool loadGomiCalendarFromCSV(struct GomiCalendar *gomiCalendar,const char* fileName,int number){
   File file = SD.open(fileName);
   const char delimiter = ',';
@@ -75,7 +92,7 @@ bool loadGomiCalendarFromCSV(struct GomiCalendar *gomiCalendar,const char* fileN
       if(row > 0){
         int gomiCalendarIndex = row - 1;
         if(column == 0){  // day field
-          memcpy((gomiCalendar + gomiCalendarIndex)->day,buf,10);
+          memcpy((gomiCalendar + gomiCalendarIndex)->day,buf,12);
           Serial.printf("[%d]%s write\n",gomiCalendarIndex,(gomiCalendar + gomiCalendarIndex)->day);
         }else if(column == 1){
           ( gomiCalendar + gomiCalendarIndex)->dayOfWeek = dayOfWeekStringToEnum(buf);
@@ -117,8 +134,7 @@ bool getTermGomisuteCalendar(struct GomiCalendar *gomiCalendar,struct GomiCalend
 
   // baseIndexを探す
   Serial.printf("target[%s]",baseDayString);
-  // for(int index = 0;index < DATA_RECORD_NUM;index++){
-  for(int index = 188;index < 192;index++){
+  for(int index = 0;index < DATA_RECORD_NUM;index++){
     printf("%s\n",(gomiMasterCalendar + index)->day);
     if(memcmp((gomiMasterCalendar + index)->day,baseDayString,strlen(baseDayString)) == 0){
       baseIndex = index;

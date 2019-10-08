@@ -21,10 +21,53 @@ void printPt16(const char* buf,uint16_t x, uint16_t y, int color){
   M5.Lcd.unloadFont();
 }
 
+int getColor(enum DayOfWeek dayOfWeek){
+  int color = BLACK;
+
+  if(dayOfWeek == SATURDAY) color = BLUE;
+  else if(dayOfWeek == SUNDAY) color = RED;
+
+  return color;
+}
+
 void printMainText(const char* buf,int color,int index){
   if(buf == NULL) return;
   if(index >= SUB_INDEX_MAX)  return;
   printPt16(buf,ORGPOINTX + (MAIN_OFFSETX * index),MAIN_TEXT_ORGPOINTY,color);
+}
+
+void printMainTextToday(const char* YYYYMMDDString,enum DayOfWeek dayOfWeek){
+  char date[10] = {0};
+  int strOffset = 0;
+
+  printPt16("本日 ",ORGPOINTX,MAIN_TEXT_ORGPOINTY,BLACK);
+  strOffset = 5;
+  // YYYYを除去
+  memcpy(date,YYYYMMDDString + 5,strlen(YYYYMMDDString + 5));
+  printPt16(date,ORGPOINTX + (strOffset * 8),MAIN_TEXT_ORGPOINTY,BLACK);
+  strOffset = strOffset + strlen(date);
+  printPt16("(",ORGPOINTX + (strOffset * 8),MAIN_TEXT_ORGPOINTY,BLACK);
+  strOffset = strOffset + 1;
+  printPt16(dayOfWeekEnumToString(dayOfWeek),ORGPOINTX + (strOffset * 8),MAIN_TEXT_ORGPOINTY,getColor(dayOfWeek));
+  strOffset = strOffset + 2;
+  printPt16(")",ORGPOINTX + (strOffset * 8),MAIN_TEXT_ORGPOINTY,BLACK);
+}
+
+void printMainTextTomorrow(const char* YYYYMMDDString,enum DayOfWeek dayOfWeek){
+  char date[10] = {0};
+  int strOffset = 0;
+
+  printPt16("明日 ",ORGPOINTX + MAIN_OFFSETX,MAIN_TEXT_ORGPOINTY,BLACK);
+  strOffset = 5;
+  // YYYYを除去
+  memcpy(date,YYYYMMDDString + 5,strlen(YYYYMMDDString + 5));
+  printPt16(date,ORGPOINTX + MAIN_OFFSETX + (strOffset * 8),MAIN_TEXT_ORGPOINTY,BLACK);
+  strOffset = strOffset + strlen(date);
+  printPt16("(",ORGPOINTX + MAIN_OFFSETX + (strOffset * 8),MAIN_TEXT_ORGPOINTY,BLACK);
+  strOffset = strOffset + 1;
+  printPt16(dayOfWeekEnumToString(dayOfWeek),ORGPOINTX + MAIN_OFFSETX + (strOffset * 8),MAIN_TEXT_ORGPOINTY,getColor(dayOfWeek));
+  strOffset = strOffset + 2;
+  printPt16(")",ORGPOINTX + MAIN_OFFSETX + (strOffset * 8),MAIN_TEXT_ORGPOINTY,BLACK);
 }
 
 void printMainPicture(const char* fileName,int index){
@@ -37,6 +80,10 @@ void printSubText(const char* buf,int color,int index){
   if(buf == NULL) return;
   if(index >= SUB_INDEX_MAX)  return;
   printPt16(buf,17/* 即値オフセット*/ + ORGPOINTX + (SUB_OFFSETX * index),SUB_TEXT_ORGPOINTY,color);
+}
+
+void printSubTextDayOfWeek(enum DayOfWeek dayOfWeek,int index){
+  printSubText(dayOfWeekEnumToString(dayOfWeek),getColor(dayOfWeek),index);
 }
 
 void printSubPicture(const char* fileName,int index){
