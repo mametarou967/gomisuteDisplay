@@ -1,8 +1,9 @@
 #include <M5Stack.h>
 #include <WiFi.h>
+#include <ArduinoJson.h>
 
-const char *ssid = "yourSsiD";
-const char *password = "yourPassword";
+// const char *ssid = "yourSsiD";
+// const char *password = "yourPassword";
 
 const char* ntpServer =  "ntp.jst.mfeed.ad.jp";
 const long  gmtOffset_sec = 9 * 3600;
@@ -55,6 +56,27 @@ void setup() {
   // put your setup code here, to run once:
   M5.begin();
   M5.Lcd.clear(WHITE);
+
+  // wifi setup
+  DynamicJsonDocument doc(1024);
+  int wifiConfigIndex = 0;
+  char wifiConfig[256] = {0};
+  File file = SD.open("/config/wifiConfig.json");
+  if (file) {
+    while (file.available()) {
+      char readData = file.read();
+      Serial.write(readData);
+      wifiConfig[wifiConfigIndex] = readData;
+      wifiConfigIndex = wifiConfigIndex + 1;
+    }
+    file.close();
+  }
+  deserializeJson(doc, wifiConfig);
+  const char *ssid = doc["ssid"];
+  const char *password = doc["password"];
+  Serial.printf("[ssid]%s ",ssid);
+  Serial.printf("[password]%s ",password);
+  
 
   //connect to WiFi
   Serial.printf("Connecting to %s ", ssid);
