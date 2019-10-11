@@ -1,7 +1,16 @@
 #include <M5Stack.h>
+#include <WiFi.h>
+
+const char *ssid = "yourSsiD";
+const char *password = "yourPassword";
+
+const char* ntpServer =  "ntp.jst.mfeed.ad.jp";
+const long  gmtOffset_sec = 9 * 3600;
+const int   daylightOffset_sec = 0;
 
 #define DATA_RECORD_NUM 400
 #define DATA_DISPLAY_RECORD_NUM 8 // today + tomorrow + next day6
+#define DATE_BUFF_LEN 12
 
 enum FileSize{
   S50X50,
@@ -30,7 +39,7 @@ enum DayOfWeek{
 };
 
 struct GomiCalendar{
-  char day[12];
+  char day[DATE_BUFF_LEN];
   enum DayOfWeek dayOfWeek;
   enum GomiShubetsu gomiShubetsu;
 };
@@ -47,12 +56,38 @@ void setup() {
   M5.begin();
   M5.Lcd.clear(WHITE);
 
+  //connect to WiFi
+  Serial.printf("Connecting to %s ", ssid);
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("CONNECTED");
+
+  //init and get the time
+  configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
+      struct tm timeinfo;
+  if (!getLocalTime(&timeinfo)) {
+    Serial.println("Failed to obtain time");
+    return;
+  }
+  
+  //disconnect WiFi as it's no longer needed
+  WiFi.disconnect(true);
+  WiFi.mode(WIFI_OFF);
+
+  char dateString[DATE_BUFF_LEN] = {0};
+  sprintf(dateString,"%d/%d/%d",timeinfo.tm_year + 1900,timeinfo.tm_mon + 1,timeinfo.tm_mday);
+  Serial.printf("[date]%s",dateString);
+  
+  // csv read
   Serial.println("read start");
   loadGomiCalendarFromCSV(gomiCalendar,"/test.csv",3);
   Serial.println("read end");
 
   Serial.println("get start");
-  bool result = getTermGomisuteCalendar(gomiDisplayCalendar,gomiCalendar,"2019/10/19",DATA_DISPLAY_RECORD_NUM);
+  bool result = getTermGomisuteCalendar(gomiDisplayCalendar,gomiCalendar,dateString,DATA_DISPLAY_RECORD_NUM);
   if(result) Serial.println("get sucess");
   Serial.println("get end");
 
