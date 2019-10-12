@@ -1,10 +1,13 @@
 #include <M5Stack.h>
 #include <WiFi.h>
-#include <ArduinoJson.h>
+#include "WifiConfig.h"
 
 const char* ntpServer =  "ntp.jst.mfeed.ad.jp";
 const long  gmtOffset_sec = 9 * 3600;
 const int   daylightOffset_sec = 0;
+
+char ssid[32] = {0};
+char password[32] = {0};
 
 #define DATA_RECORD_NUM 400
 #define DATA_DISPLAY_RECORD_NUM 8 // today + tomorrow + next day6
@@ -54,30 +57,15 @@ void setup() {
   M5.begin();
   M5.Lcd.clear(WHITE);
 
-  // wifi setup
-  DynamicJsonDocument doc(1024);
-  int wifiConfigIndex = 0;
-  char wifiConfig[256] = {0};
-  File file = SD.open("/config/wifiConfig.json");
-  if (file) {
-    while (file.available()) {
-      char readData = file.read();
-      Serial.write(readData);
-      wifiConfig[wifiConfigIndex] = readData;
-      wifiConfigIndex = wifiConfigIndex + 1;
-    }
-    file.close();
-  }
-  deserializeJson(doc, wifiConfig);
-  const char *ssid = doc["ssid"];
-  const char *password = doc["password"];
-  Serial.printf("[ssid]%s ",ssid);
-  Serial.printf("[password]%s ",password);
-  
+  WifiConfig wifiConfig;
+  wifiConfig.wifiConfigLoad("/config/wifiConfig.json");
+  wifiConfig.GetSsid().toCharArray(ssid,wifiConfig.GetSsid().length());
+  wifiConfig.GetPassword().toCharArray(ssid,wifiConfig.GetPassword().length());
 
   //connect to WiFi
   Serial.printf("Connecting to %s ", ssid);
-  WiFi.begin(ssid, password);
+  Serial.printf("password to %s ", password);
+  WiFi.begin("106F3F019E00", "01f4prsverbc9");
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
