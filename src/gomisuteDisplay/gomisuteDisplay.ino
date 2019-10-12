@@ -2,9 +2,6 @@
 #include <WiFi.h>
 #include <ArduinoJson.h>
 
-// const char *ssid = "yourSsiD";
-// const char *password = "yourPassword";
-
 const char* ntpServer =  "ntp.jst.mfeed.ad.jp";
 const long  gmtOffset_sec = 9 * 3600;
 const int   daylightOffset_sec = 0;
@@ -105,7 +102,7 @@ void setup() {
   
   // csv read
   Serial.println("read start");
-  loadGomiCalendarFromCSV(gomiCalendar,"/test.csv",3);
+  loadGomiCalendarFromCSV(gomiCalendar,"/test.csv",5);
   Serial.println("read end");
 
   Serial.println("get start");
