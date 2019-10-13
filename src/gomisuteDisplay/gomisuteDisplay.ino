@@ -3,10 +3,6 @@
 #include "WifiConfig.h"
 #include "Ntp.h"
 
-const char* ntpServer =  "ntp.jst.mfeed.ad.jp";
-const long  gmtOffset_sec = 9 * 3600;
-const int   daylightOffset_sec = 0;
-
 char ssid[32] = {0};
 char password[32] = {0};
 
@@ -80,13 +76,14 @@ void setup() {
   Ntp ntp;
   ntp.GetTime(&timeinfo);
   
-  //disconnect WiFi as it's no longer needed
-  WiFi.disconnect(true);
-  WiFi.mode(WIFI_OFF);
-
+  // 取得した時間を整形して保持
   char dateString[DATE_BUFF_LEN] = {0};
   sprintf(dateString,"%d/%d/%d",timeinfo.tm_year + 1900,timeinfo.tm_mon + 1,timeinfo.tm_mday);
   Serial.printf("[date]%s",dateString);
+  
+  //disconnect WiFi as it's no longer needed
+  WiFi.disconnect(true);
+  WiFi.mode(WIFI_OFF);
   
   // csv read
   Serial.println("read start");
