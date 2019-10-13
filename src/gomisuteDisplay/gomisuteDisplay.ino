@@ -70,7 +70,7 @@ void setup() {
   Serial.printf("password to %s ", password);
   WiFi.disconnect(true);
   WiFi.disconnect(true,true);
-  WiFi.begin("106F3F019E00", "01f4prsverbc9");
+  WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
