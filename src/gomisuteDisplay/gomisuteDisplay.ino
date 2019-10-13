@@ -58,6 +58,25 @@ void ConvertTmToString(char *dateString,struct tm *dateTm){
   sprintf(dateString,"%d/%d/%d",dateTm->tm_year + 1900,dateTm->tm_mon + 1,dateTm->tm_mday);
 }
 
+void displayAll(struct GomiCalendar gomiDisplayCalendar[]){
+  M5.Lcd.clear(WHITE);
+  
+  for(int i = 0;i < DATA_DISPLAY_RECORD_NUM;i++){
+    Serial.printf("[%s],%d,%d",gomiDisplayCalendar[i].day,gomiDisplayCalendar[i].dayOfWeek,gomiDisplayCalendar[i].gomiShubetsu);
+  }
+  
+    // Main
+  printMainTextToday(gomiDisplayCalendar[0].day,gomiDisplayCalendar[0].dayOfWeek);
+  printMainPicture(getFilePath(gomiDisplayCalendar[0].gomiShubetsu,S150X150),0);
+  printMainTextTomorrow(gomiDisplayCalendar[1].day,gomiDisplayCalendar[1].dayOfWeek);
+  printMainPicture(getFilePath(gomiDisplayCalendar[1].gomiShubetsu,S150X150),1);
+  // Sub
+  for(int subIndex = 0;subIndex < 6;subIndex++ ){
+    printSubTextDayOfWeek(gomiDisplayCalendar[subIndex + 2].dayOfWeek,subIndex);
+    printSubPicture(getFilePath(gomiDisplayCalendar[subIndex + 2].gomiShubetsu,S50X50),subIndex);
+  }
+}
+
 void setup() {
 
   Serial.begin(115200);
@@ -111,39 +130,18 @@ void setup() {
   if(result) Serial.println("get sucess");
   Serial.println("get end");
 
-  for(int i = 0;i < DATA_DISPLAY_RECORD_NUM;i++){
-    Serial.printf("[%s],%d,%d",gomiDisplayCalendar[i].day,gomiDisplayCalendar[i].dayOfWeek,gomiDisplayCalendar[i].gomiShubetsu);
-  }
-
-  // Main
-  printMainTextToday(gomiDisplayCalendar[0].day,gomiDisplayCalendar[0].dayOfWeek);
-  printMainPicture(getFilePath(gomiDisplayCalendar[0].gomiShubetsu,S150X150),0);
-  printMainTextTomorrow(gomiDisplayCalendar[1].day,gomiDisplayCalendar[1].dayOfWeek);
-  printMainPicture(getFilePath(gomiDisplayCalendar[1].gomiShubetsu,S150X150),1);
-  // Sub
-  for(int subIndex = 0;subIndex < 6;subIndex++ ){
-    printSubTextDayOfWeek(gomiDisplayCalendar[subIndex + 2].dayOfWeek,subIndex);
-    printSubPicture(getFilePath(gomiDisplayCalendar[subIndex + 2].gomiShubetsu,S50X50),subIndex);
-  }
+  displayAll(gomiDisplayCalendar);
 }
 
 
 void loop() {
 
+  // 現在時刻を取得
   struct tm timeinfo;
+  GetLocalTime(&timeinfo);
+  ConvertTmToString(nowDateString,&timeinfo);
 
-  // test
-  if (M5.BtnA.wasPressed()) {
-    Serial.println("A press");
-    memcpy(nowDateString,"2019/10/14",strlen("2019/10/14"));
-  }
-  
-  if(M5.BtnB.wasPressed()){
-    Serial.println("B press");
-    GetLocalTime(&timeinfo);
-    ConvertTmToString(nowDateString,&timeinfo);
-  }
-
+  // 日付が変更された場合は表示を更新
   if(strcmp(preDateString,nowDateString) != 0){
     Serial.println("diff");
     Serial.printf("now[date]%s",nowDateString);
@@ -151,30 +149,14 @@ void loop() {
     bool result = getTermGomisuteCalendar(gomiDisplayCalendar,gomiCalendar,nowDateString,DATA_DISPLAY_RECORD_NUM);
     if(result) Serial.println("get sucess");
 
-    // 画面をリセットする
-    M5.Lcd.clear(WHITE);
-
-    // 再表示
-    for(int i = 0;i < DATA_DISPLAY_RECORD_NUM;i++){
-      Serial.printf("[%s],%d,%d",gomiDisplayCalendar[i].day,gomiDisplayCalendar[i].dayOfWeek,gomiDisplayCalendar[i].gomiShubetsu);
-    }
-
-    // Main
-    printMainTextToday(gomiDisplayCalendar[0].day,gomiDisplayCalendar[0].dayOfWeek);
-    printMainPicture(getFilePath(gomiDisplayCalendar[0].gomiShubetsu,S150X150),0);
-    printMainTextTomorrow(gomiDisplayCalendar[1].day,gomiDisplayCalendar[1].dayOfWeek);
-    printMainPicture(getFilePath(gomiDisplayCalendar[1].gomiShubetsu,S150X150),1);
-    // Sub
-    for(int subIndex = 0;subIndex < 6;subIndex++ ){
-      printSubTextDayOfWeek(gomiDisplayCalendar[subIndex + 2].dayOfWeek,subIndex);
-      printSubPicture(getFilePath(gomiDisplayCalendar[subIndex + 2].gomiShubetsu,S50X50),subIndex);
-    }
+    displayAll(gomiDisplayCalendar);
 
     // 前回日時を更新
     memcpy(preDateString,nowDateString,strlen(preDateString));
   }else{
     Serial.println("same");
   }
+  
   // put your main code here, to run repeatedly:
   delay(1000);  // 1秒
   M5.update();
