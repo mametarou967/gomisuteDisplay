@@ -2,13 +2,14 @@
 #include <WiFi.h>
 #include "WifiConfig.h"
 #include "Ntp.h"
-
-char ssid[32] = {0};
-char password[32] = {0};
-
 #define DATA_RECORD_NUM 400
 #define DATA_DISPLAY_RECORD_NUM 8 // today + tomorrow + next day6
 #define DATE_BUFF_LEN 12
+
+char ssid[32] = {0};
+char password[32] = {0};
+char nowDateString[DATE_BUFF_LEN] = {0};
+char preDateString[DATE_BUFF_LEN] = {0};
 
 enum FileSize{
   S50X50,
@@ -53,6 +54,10 @@ bool GetLocalTime(struct tm *timenow){
   return true;
 }
 
+void ConvertTmToString(char *dateString,struct tm *dateTm){
+  sprintf(dateString,"%d/%d/%d",dateTm->tm_year + 1900,dateTm->tm_mon + 1,dateTm->tm_mday);
+}
+
 void setup() {
 
   Serial.begin(115200);
@@ -79,16 +84,18 @@ void setup() {
   }
   Serial.println("CONNECTED");
 
-  // 時間の取得
+  // NTPより時間の取得
   struct tm timeinfo;
   Ntp ntp;
   ntp.GetTime();
-  GetLocalTime(&timeinfo);
   
   // 取得した時間を整形して保持
   char dateString[DATE_BUFF_LEN] = {0};
-  sprintf(dateString,"%d/%d/%d",timeinfo.tm_year + 1900,timeinfo.tm_mon + 1,timeinfo.tm_mday);
-  Serial.printf("[date]%s",dateString);
+  GetLocalTime(&timeinfo);
+  ConvertTmToString(nowDateString,&timeinfo);
+  strcpy(preDateString,nowDateString);
+  Serial.printf("now[date]%s",nowDateString);
+  Serial.printf("pre[date]%s",preDateString);
   
   //disconnect WiFi as it's no longer needed
   WiFi.disconnect(true);
@@ -100,7 +107,7 @@ void setup() {
   Serial.println("read end");
 
   Serial.println("get start");
-  bool result = getTermGomisuteCalendar(gomiDisplayCalendar,gomiCalendar,dateString,DATA_DISPLAY_RECORD_NUM);
+  bool result = getTermGomisuteCalendar(gomiDisplayCalendar,gomiCalendar,nowDateString,DATA_DISPLAY_RECORD_NUM);
   if(result) Serial.println("get sucess");
   Serial.println("get end");
 
@@ -120,7 +127,55 @@ void setup() {
   }
 }
 
+
 void loop() {
+
+  struct tm timeinfo;
+
+  // test
+  if (M5.BtnA.wasPressed()) {
+    Serial.println("A press");
+    memcpy(nowDateString,"2019/10/14",strlen("2019/10/14"));
+  }
+  
+  if(M5.BtnB.wasPressed()){
+    Serial.println("B press");
+    GetLocalTime(&timeinfo);
+    ConvertTmToString(nowDateString,&timeinfo);
+  }
+
+  if(strcmp(preDateString,nowDateString) != 0){
+    Serial.println("diff");
+    Serial.printf("now[date]%s",nowDateString);
+    Serial.printf("pre[date]%s",preDateString);
+    bool result = getTermGomisuteCalendar(gomiDisplayCalendar,gomiCalendar,nowDateString,DATA_DISPLAY_RECORD_NUM);
+    if(result) Serial.println("get sucess");
+
+    // 画面をリセットする
+    M5.Lcd.clear(WHITE);
+
+    // 再表示
+    for(int i = 0;i < DATA_DISPLAY_RECORD_NUM;i++){
+      Serial.printf("[%s],%d,%d",gomiDisplayCalendar[i].day,gomiDisplayCalendar[i].dayOfWeek,gomiDisplayCalendar[i].gomiShubetsu);
+    }
+
+    // Main
+    printMainTextToday(gomiDisplayCalendar[0].day,gomiDisplayCalendar[0].dayOfWeek);
+    printMainPicture(getFilePath(gomiDisplayCalendar[0].gomiShubetsu,S150X150),0);
+    printMainTextTomorrow(gomiDisplayCalendar[1].day,gomiDisplayCalendar[1].dayOfWeek);
+    printMainPicture(getFilePath(gomiDisplayCalendar[1].gomiShubetsu,S150X150),1);
+    // Sub
+    for(int subIndex = 0;subIndex < 6;subIndex++ ){
+      printSubTextDayOfWeek(gomiDisplayCalendar[subIndex + 2].dayOfWeek,subIndex);
+      printSubPicture(getFilePath(gomiDisplayCalendar[subIndex + 2].gomiShubetsu,S50X50),subIndex);
+    }
+
+    // 前回日時を更新
+    memcpy(preDateString,nowDateString,strlen(preDateString));
+  }else{
+    Serial.println("same");
+  }
   // put your main code here, to run repeatedly:
   delay(1000);  // 1秒
+  M5.update();
 }
