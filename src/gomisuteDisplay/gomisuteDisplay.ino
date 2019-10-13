@@ -45,6 +45,7 @@ struct GomiCalendar{
 
 struct GomiCalendar gomiCalendar[DATA_RECORD_NUM];
 struct GomiCalendar gomiDisplayCalendar[DATA_DISPLAY_RECORD_NUM];
+struct tm brightStartTime;
 
 bool GetLocalTime(struct tm *timenow){
   if (!getLocalTime(timenow)) {
@@ -85,6 +86,7 @@ void setup() {
   // put your setup code here, to run once:
   M5.begin();
   M5.Lcd.clear(WHITE);
+  M5.Lcd.setBrightness(90);
 
   WifiConfig wifiConfig;
   wifiConfig.wifiConfigLoad("/config/wifiConfig.json");
@@ -131,6 +133,8 @@ void setup() {
   Serial.println("get end");
 
   displayAll(gomiDisplayCalendar);
+  // 輝度基準時間をすべての画像の描画後に設定する
+  GetLocalTime(&brightStartTime);
 }
 
 
@@ -153,10 +157,24 @@ void loop() {
 
     // 前回日時を更新
     memcpy(preDateString,nowDateString,strlen(preDateString));
-  }else{
-    Serial.println("same");
   }
-  
+
+  // ボタンを押されるとLEDを明るくする
+  if(M5.BtnA.wasPressed() || M5.BtnB.wasPressed() || M5.BtnC.wasPressed()){
+    Serial.println("button pressed");
+    M5.Lcd.setBrightness(90);
+    GetLocalTime(&brightStartTime); // 明るくした時間を記録
+  }
+
+  Serial.printf("pre[]%ld\n",mktime(&brightStartTime));
+  Serial.printf("now[]%ld\n",mktime(&timeinfo));
+  Serial.printf("diff[]%lf\n",difftime(mktime(&brightStartTime),mktime(&timeinfo)));
+  // LEDを明るくしてから20秒後にLEDを暗くする
+  if( difftime(mktime(&timeinfo),mktime(&brightStartTime)) > 20.0 ){
+    Serial.println("time passed");
+    M5.Lcd.setBrightness(1);
+  }
+
   // put your main code here, to run repeatedly:
   delay(1000);  // 1秒
   M5.update();
