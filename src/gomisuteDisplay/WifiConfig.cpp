@@ -40,16 +40,20 @@ bool WifiConfig::wifiConfigLoad(const char *wifiConfiglePath){
   deserializeJson(doc, wifiConfig);
   ssidChar = doc["ssid"];
   passwordChar = doc["password"];
-  ssid = String(ssidChar);
-  password = String(passwordChar);
+  memcpy(ssid,ssidChar,strlen(ssidChar));
+  memcpy(password,passwordChar,strlen(passwordChar));
   Serial.println(ssid);
   Serial.println(password);
+
+  return true;
 }
 
-String WifiConfig::GetSsid(void){
-  return ssid;
+void WifiConfig::GetSsid(char *outSsid){
+  memcpy(outSsid,ssid,strlen(ssid));
+  return;
 }
 
-String WifiConfig::GetPassword(void){
-  return password;
+void WifiConfig::GetPassword(char *outPassword){
+  memcpy(outPassword,password,strlen(password));
+  return;
 }

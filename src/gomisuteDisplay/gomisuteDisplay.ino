@@ -59,12 +59,17 @@ void setup() {
 
   WifiConfig wifiConfig;
   wifiConfig.wifiConfigLoad("/config/wifiConfig.json");
-  wifiConfig.GetSsid().toCharArray(ssid,wifiConfig.GetSsid().length());
-  wifiConfig.GetPassword().toCharArray(ssid,wifiConfig.GetPassword().length());
+  wifiConfig.GetSsid(ssid);
+  wifiConfig.GetPassword(password);
+ 
+  // wifiConfig.GetSsid().toCharArray(ssid,wifiConfig.GetSsid().length());
+  // wifiConfig.GetPassword().toCharArray(password,wifiConfig.GetPassword().length());
 
   //connect to WiFi
   Serial.printf("Connecting to %s ", ssid);
   Serial.printf("password to %s ", password);
+  WiFi.disconnect(true);
+  WiFi.disconnect(true,true);
   WiFi.begin("106F3F019E00", "01f4prsverbc9");
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);

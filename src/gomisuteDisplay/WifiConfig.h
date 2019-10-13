@@ -5,12 +5,12 @@
 class  WifiConfig{
   public:
     bool wifiConfigLoad(const char *wifiConfiglePath);
-    String GetSsid(void);
-    String GetPassword(void);
+    void GetSsid(char *outSsid);
+    void GetPassword(char *outPassword);
     
   private:
-    String ssid;
-    String password;
+    char ssid[32];
+    char password[32];
 };
 
 #endif
