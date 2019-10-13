@@ -1,6 +1,7 @@
 #include <M5Stack.h>
 #include <WiFi.h>
 #include "WifiConfig.h"
+#include "Ntp.h"
 
 const char* ntpServer =  "ntp.jst.mfeed.ad.jp";
 const long  gmtOffset_sec = 9 * 3600;
@@ -62,9 +63,6 @@ void setup() {
   wifiConfig.GetSsid(ssid);
   wifiConfig.GetPassword(password);
  
-  // wifiConfig.GetSsid().toCharArray(ssid,wifiConfig.GetSsid().length());
-  // wifiConfig.GetPassword().toCharArray(password,wifiConfig.GetPassword().length());
-
   //connect to WiFi
   Serial.printf("Connecting to %s ", ssid);
   Serial.printf("password to %s ", password);
@@ -77,13 +75,10 @@ void setup() {
   }
   Serial.println("CONNECTED");
 
-  //init and get the time
-  configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
-      struct tm timeinfo;
-  if (!getLocalTime(&timeinfo)) {
-    Serial.println("Failed to obtain time");
-    return;
-  }
+  // 時間の取得
+  struct tm timeinfo;
+  Ntp ntp;
+  ntp.GetTime(&timeinfo);
   
   //disconnect WiFi as it's no longer needed
   WiFi.disconnect(true);
