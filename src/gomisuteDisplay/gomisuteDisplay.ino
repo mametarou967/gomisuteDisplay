@@ -45,6 +45,14 @@ struct GomiCalendar{
 struct GomiCalendar gomiCalendar[DATA_RECORD_NUM];
 struct GomiCalendar gomiDisplayCalendar[DATA_DISPLAY_RECORD_NUM];
 
+bool GetLocalTime(struct tm *timenow){
+  if (!getLocalTime(timenow)) {
+    Serial.println("Failed to obtain time");
+    return false;
+  }
+  return true;
+}
+
 void setup() {
 
   Serial.begin(115200);
@@ -74,7 +82,8 @@ void setup() {
   // 時間の取得
   struct tm timeinfo;
   Ntp ntp;
-  ntp.GetTime(&timeinfo);
+  ntp.GetTime();
+  GetLocalTime(&timeinfo);
   
   // 取得した時間を整形して保持
   char dateString[DATE_BUFF_LEN] = {0};

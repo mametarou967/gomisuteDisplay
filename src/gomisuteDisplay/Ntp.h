@@ -4,7 +4,7 @@
 
 class Ntp{
   public:
-    bool GetTime(struct tm *timenow);
+    void GetTime(void);
 
 };
 
