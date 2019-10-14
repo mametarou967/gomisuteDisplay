@@ -1,10 +1,15 @@
 #include <M5Stack.h>
 #include <WiFi.h>
+#include <HCSR04.h>
 #include "WifiConfig.h"
 #include "Ntp.h"
 #define DATA_RECORD_NUM 400
 #define DATA_DISPLAY_RECORD_NUM 8 // today + tomorrow + next day6
 #define DATE_BUFF_LEN 12
+
+// triggerPinをpin2につなぎます
+// echoPinをpin5につなぎます
+UltraSonicDistanceSensor distanceSensor(2, 5);
 
 char ssid[32] = {0};
 char password[32] = {0};
@@ -159,9 +164,15 @@ void loop() {
     memcpy(preDateString,nowDateString,strlen(preDateString));
   }
 
-  // ボタンを押されるとLEDを明るくする
+  // ボタンを押すか、一定の距離に人が近づくとLEDを明るくする
+  double distance = distanceSensor.measureDistanceCm();
+  Serial.println(distance);
   if(M5.BtnA.wasPressed() || M5.BtnB.wasPressed() || M5.BtnC.wasPressed()){
     Serial.println("button pressed");
+    M5.Lcd.setBrightness(90);
+    GetLocalTime(&brightStartTime); // 明るくした時間を記録
+  }else if((distance >= 0.0) && (distance <= 30.0)){
+    Serial.println("distance sence");
     M5.Lcd.setBrightness(90);
     GetLocalTime(&brightStartTime); // 明るくした時間を記録
   }
