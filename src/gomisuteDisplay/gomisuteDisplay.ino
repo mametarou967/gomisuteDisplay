@@ -1,5 +1,6 @@
 #include <M5Stack.h>
 #include <WiFi.h>
+#include <HTTPClient.h>
 #include <HCSR04.h>
 #include "WifiConfig.h"
 #include "Ntp.h"
@@ -15,6 +16,7 @@ char ssid[32] = {0};
 char password[32] = {0};
 char nowDateString[DATE_BUFF_LEN] = {0};
 char preDateString[DATE_BUFF_LEN] = {0};
+bool brightHigh = false;
 
 enum FileSize{
   S50X50,
@@ -51,6 +53,25 @@ struct GomiCalendar{
 struct GomiCalendar gomiCalendar[DATA_RECORD_NUM];
 struct GomiCalendar gomiDisplayCalendar[DATA_DISPLAY_RECORD_NUM];
 struct tm brightStartTime;
+const String eventname = "m5stack_button_pressed";   // IFTTT で作った Applet の Webhooks を使用した時に設定したイベントの名前
+const String apikey = "dGyYO8E3eb8I-K3_1ccGcI";   // Webhooks で発行された API Key
+
+const String url = "http://maker.ifttt.com/trigger/" + eventname + "/with/key/" + apikey;   // API の HTTP リクエスト
+
+void sendIfttt(){
+  
+  String val1 = "100";
+  String val2 = "50";
+  String val3 = "250";
+
+  String json = "{ \"value1\" : " + val1 + ", \"value2\" : " + val2 + ", \"value3\" : " + val3 + " }";   // JSON データの作成
+
+  HTTPClient http;   // インスタンスの生成
+  http.begin(url);   // HTTP リクエストの設定
+  http.addHeader("Content-Type", "application/json");   // 送信形式を JSON データに設定
+  http.POST(json);   // POST リクエストで送信
+  http.end();
+}
 
 bool GetLocalTime(struct tm *timenow){
   if (!getLocalTime(timenow)) {
@@ -124,8 +145,8 @@ void setup() {
   Serial.printf("pre[date]%s",preDateString);
   
   //disconnect WiFi as it's no longer needed
-  WiFi.disconnect(true);
-  WiFi.mode(WIFI_OFF);
+  // WiFi.disconnect(true);
+  // WiFi.mode(WIFI_OFF);
   
   // csv read
   Serial.println("read start");
@@ -140,6 +161,7 @@ void setup() {
   displayAll(gomiDisplayCalendar);
   // 輝度基準時間をすべての画像の描画後に設定する
   GetLocalTime(&brightStartTime);
+  brightHigh = true;
 }
 
 
@@ -166,24 +188,27 @@ void loop() {
 
   // ボタンを押すか、一定の距離に人が近づくとLEDを明るくする
   double distance = distanceSensor.measureDistanceCm();
-  Serial.println(distance);
   if(M5.BtnA.wasPressed() || M5.BtnB.wasPressed() || M5.BtnC.wasPressed()){
+    if(brightHigh == true){
+      // ボタンを押したとき、すでに明るい状態だった場合は何か処理させる
+      Serial.println("send?\n");
+      sendIfttt();
+    }
     Serial.println("button pressed");
     M5.Lcd.setBrightness(90);
     GetLocalTime(&brightStartTime); // 明るくした時間を記録
+    brightHigh = true;
   }else if((distance >= 0.0) && (distance <= 30.0)){
     Serial.println("distance sence");
     M5.Lcd.setBrightness(90);
     GetLocalTime(&brightStartTime); // 明るくした時間を記録
+    brightHigh = true;
   }
 
-  Serial.printf("pre[]%ld\n",mktime(&brightStartTime));
-  Serial.printf("now[]%ld\n",mktime(&timeinfo));
-  Serial.printf("diff[]%lf\n",difftime(mktime(&brightStartTime),mktime(&timeinfo)));
   // LEDを明るくしてから20秒後にLEDを暗くする
   if( difftime(mktime(&timeinfo),mktime(&brightStartTime)) > 20.0 ){
-    Serial.println("time passed");
     M5.Lcd.setBrightness(1);
+    brightHigh = false;
   }
 
   // put your main code here, to run repeatedly:
