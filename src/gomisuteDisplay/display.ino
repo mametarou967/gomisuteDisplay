@@ -70,10 +70,13 @@ void printMainTextTomorrow(const char* YYYYMMDDString,enum DayOfWeek dayOfWeek){
   printPt16(")",ORGPOINTX + MAIN_OFFSETX + (strOffset * 8),MAIN_TEXT_ORGPOINTY,BLACK);
 }
 
-void printMainPicture(const char* fileName,int index){
-  if(fileName == NULL) return;
+void printMainPicture(String fileName,int index){
+  char buf[64] = {0};
+  
+  fileName.toCharArray(buf,sizeof(buf));
+  if(buf == NULL) return;
   if(index >= MAIN_INDEX_MAX)  return;
-  M5.Lcd.drawJpgFile(SD, fileName,ORGPOINTX + (MAIN_OFFSETX * index),MAIN_PICTURE_ORGPOINTY);
+  M5.Lcd.drawJpgFile(SD, buf,ORGPOINTX + (MAIN_OFFSETX * index),MAIN_PICTURE_ORGPOINTY);
 }
 
 void printSubText(const char* buf,int color,int index){
@@ -86,8 +89,11 @@ void printSubTextDayOfWeek(enum DayOfWeek dayOfWeek,int index){
   printSubText(dayOfWeekEnumToString(dayOfWeek),getColor(dayOfWeek),index);
 }
 
-void printSubPicture(const char* fileName,int index){
-  if(fileName == NULL) return;
+void printSubPicture(String fileName,int index){
+  char buf[64] = {0};
+  
+  fileName.toCharArray(buf,sizeof(buf));
+  if(buf == NULL) return;
   if(index >= SUB_INDEX_MAX)  return;
-  M5.Lcd.drawJpgFile(SD, fileName,ORGPOINTX + (SUB_OFFSETX * index),SUB_PICTURE_ORGPOINTY);
+  M5.Lcd.drawJpgFile(SD, buf,ORGPOINTX + (SUB_OFFSETX * index),SUB_PICTURE_ORGPOINTY);
 }

@@ -1,50 +1,40 @@
-char *getFilePath(enum GomiShubetsu gomiShubetsu,enum FileSize fizeSize){
-  char *filePath = NULL;
+String getFilePath(enum GomiShubetsu gomiShubetsu,enum FileSize fizeSize,bool checked){
+  String filePath;
+  char buf[64] = {0};
+  
+  if(fizeSize == S50X50){
+    filePath.concat("/pic50x50/");
+  }else{
+    filePath.concat("/pic150x150/");
+  }
+
+  if(checked){
+    filePath.concat("checked/");
+  }else{
+    filePath.concat("normal/");
+  }
   
   switch(gomiShubetsu){
   case KANEN:
-    if(fizeSize == S50X50){
-      filePath = "/pic50x50/moeru.jpg";
-    }else{
-      filePath = "/pic150x150/moeru.jpg";
-    }
+    filePath.concat("moeru.jpg");
     break;
   case FUNEN:
-    if(fizeSize == S50X50){
-      filePath = "/pic50x50/moenai.jpg";
-    }else{
-      filePath = "/pic150x150/moenai.jpg";
-    }
+    filePath.concat("moenai.jpg");
     break;
   case HOKAPURA:
-    if(fizeSize == S50X50){
-      filePath = "/pic50x50/plastic.jpg";
-    }else{
-      filePath = "/pic150x150/plastic.jpg";
-    }
+    filePath.concat("plastic.jpg");
     break;
   case SHIGEN:
-    if(fizeSize == S50X50){
-      filePath = "/pic50x50/shigen.jpg";
-    }else{
-      filePath = "/pic150x150/shigen.jpg";
-    }
+    filePath.concat("shigen.jpg");
     break;
   case RIPURA:
-    if(fizeSize == S50X50){
-      filePath = "/pic50x50/petbottle.jpg";
-    }else{
-      filePath = "/pic150x150/petbottle.jpg";
-    }
+    filePath.concat("petbottle.jpg");
     break;
   case SONOTA:
-    if(fizeSize == S50X50){
-      filePath = "/pic50x50/sonohoka.jpg";
-    }else{
-      filePath = "/pic150x150/sonohoka.jpg";
-    }
+    filePath.concat("sonohoka.jpg");
     break;
   default:
+    filePath = "";
     break;
   }
 

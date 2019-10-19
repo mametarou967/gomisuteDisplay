@@ -94,13 +94,13 @@ void displayAll(struct GomiCalendar gomiDisplayCalendar[]){
   
     // Main
   printMainTextToday(gomiDisplayCalendar[0].day,gomiDisplayCalendar[0].dayOfWeek);
-  printMainPicture(getFilePath(gomiDisplayCalendar[0].gomiShubetsu,S150X150),0);
+  printMainPicture(getFilePath(gomiDisplayCalendar[0].gomiShubetsu,S150X150,false),0);
   printMainTextTomorrow(gomiDisplayCalendar[1].day,gomiDisplayCalendar[1].dayOfWeek);
-  printMainPicture(getFilePath(gomiDisplayCalendar[1].gomiShubetsu,S150X150),1);
+  printMainPicture(getFilePath(gomiDisplayCalendar[1].gomiShubetsu,S150X150,false),1);
   // Sub
   for(int subIndex = 0;subIndex < 6;subIndex++ ){
     printSubTextDayOfWeek(gomiDisplayCalendar[subIndex + 2].dayOfWeek,subIndex);
-    printSubPicture(getFilePath(gomiDisplayCalendar[subIndex + 2].gomiShubetsu,S50X50),subIndex);
+    printSubPicture(getFilePath(gomiDisplayCalendar[subIndex + 2].gomiShubetsu,S50X50,false),subIndex);
   }
 }
 

@@ -34,9 +34,10 @@
     - 20秒経ったら消える
     - どれでもボタンを押したら明るくする
 - [済]近くに寄った場合に数秒間ライトをつける
-- [  ]ボタンを押すとLINEにメッセージが飛ぶ
-- [  ]ボタンを押すと済にする
+- [済]ボタンを押すとLINEにメッセージが飛ぶ
 - [  ]ネットワークにつながっていないくても動作するモード
+- [  ]ボタンを押すと済にする　＋　一回だけメッセージが飛ぶようにする
+- [  ]かっこの位置とかタイトルを整える
 
 # 表示に関して
 - かっこの位置が変
@@ -44,4 +45,4 @@
 - 上と下に余白があったほうが良い。本日と明日のアイコンを小さくする？
 - 
 
-curl -X POST --header "Content-type: application/json" https://maker.ifttt.com/trigger/m5stack_button_pressed/with/key/dGyYO8E3eb8I-K3_1ccGcI --data "{\"value1\":\"bbb\"}"
+curl -X POST --header "Content-type: application/json" https://maker.ifttt.com/trigger/m5stack_button_pressed/with/key/dGyYO8E3eb8I-K3_1ccGcI --data "{\"value1\":\"%E7%87%83%E3%81%88%E3%82%8B%E3%82%B4%E3%83%9F\"}"
