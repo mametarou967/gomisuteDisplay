@@ -2,17 +2,20 @@
 #include <string.h>
 #include <M5Stack.h>
 #include <ArduinoJson.h>
-#include "WifiConfig.h"
+#include "Config.h"
 
-bool WifiConfig::wifiConfigLoad(const char *wifiConfiglePath){
+bool Config::ConfigLoad(const char *ConfiglePath){
   bool loadResult = false;
   bool readResult = false;
   int wifiConfigIndex = 0;
   char wifiConfig[256] = {0};
   const char *ssidChar;
   const char *passwordChar;
+  const char *offlineDateChar;
+
+  memset(ssid,0,sizeof(ssid));
   
-  File file = SD.open(wifiConfiglePath);
+  File file = SD.open(ConfiglePath);
 
   if (file) {
     while (file.available()) {
@@ -21,39 +24,48 @@ bool WifiConfig::wifiConfigLoad(const char *wifiConfiglePath){
       wifiConfig[wifiConfigIndex] = readData;
       wifiConfigIndex = wifiConfigIndex + 1;
 
-      /*
-      if(WIFI_CONFIG_FILE_SIZE >= wifiConfigIndex){
-        Serial.printf("wifiConfigLoad error size over");
-        break;
-      }
-      */
     }
     file.close();
   }
 
   // Deserialization
-
   // Use a DynamicJsonDocument to store in the heap (recommended for documents larger than 1KB) 
   // -> 1024
   DynamicJsonDocument doc(1024);
 
   deserializeJson(doc, wifiConfig);
+
+  wifiActivate = doc["wifiActivate"];
+  Serial.printf("wifiActivate is %d \n", wifiActivate);
   ssidChar = doc["ssid"];
+  Serial.printf("ssidChar is %s\n",ssidChar);
   passwordChar = doc["password"];
-  memcpy(ssid,ssidChar,strlen(ssidChar));
+  offlineDateChar = doc["offlineDate"];
+  
   memcpy(password,passwordChar,strlen(passwordChar));
-  Serial.println(ssid);
-  Serial.println(password);
+  memcpy(offlineDate,offlineDateChar,strlen(offlineDateChar));
+  memcpy(ssid,ssidChar,strlen(ssidChar));
+  Serial.printf("ssid is %s\n",ssid);
+  Serial.printf("password is %s\n",password);
+  Serial.printf("offlineDate is %s\n",offlineDate);
 
   return true;
 }
 
-void WifiConfig::GetSsid(char *outSsid){
+bool Config::GetWifiActivate(){
+  if(wifiActivate == 0){
+    return false;
+  }else{
+    return true;
+  }
+}
+
+void Config::GetSsid(char *outSsid){
   memcpy(outSsid,ssid,strlen(ssid));
   return;
 }
 
-void WifiConfig::GetPassword(char *outPassword){
+void Config::GetPassword(char *outPassword){
   memcpy(outPassword,password,strlen(password));
   return;
 }

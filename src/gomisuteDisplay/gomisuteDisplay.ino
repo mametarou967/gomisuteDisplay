@@ -2,7 +2,7 @@
 #include <WiFi.h>
 #include <HTTPClient.h>
 #include <HCSR04.h>
-#include "WifiConfig.h"
+#include "Config.h"
 #include "Ntp.h"
 #define DATA_RECORD_NUM 400
 #define DATA_DISPLAY_RECORD_NUM 8 // today + tomorrow + next day6
@@ -114,10 +114,10 @@ void setup() {
   M5.Lcd.clear(WHITE);
   M5.Lcd.setBrightness(90);
 
-  WifiConfig wifiConfig;
-  wifiConfig.wifiConfigLoad("/config/wifiConfig.json");
-  wifiConfig.GetSsid(ssid);
-  wifiConfig.GetPassword(password);
+  Config localConfig;
+  localConfig.ConfigLoad("/config/Config.json");
+  localConfig.GetSsid(ssid);
+  localConfig.GetPassword(password);
  
   //connect to WiFi
   Serial.printf("Connecting to %s ", ssid);

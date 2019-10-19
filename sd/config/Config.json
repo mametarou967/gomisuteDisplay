@@ -1,0 +1,6 @@
+{
+  "wifiActivate" : 1,
+  "ssid" : "yourSsid",
+  "password" : "yourPassword",
+  "offlineDate" : "2019/10/22"
+}
