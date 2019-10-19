@@ -72,3 +72,8 @@ void Config::GetPassword(char *outPassword){
   memcpy(outPassword,password,strlen(password));
   return;
 }
+
+void Config::GetOfflineDate(char *outOfflineDated){
+  memcpy(outOfflineDated,offlineDate,strlen(offlineDate));
+  return;
+}

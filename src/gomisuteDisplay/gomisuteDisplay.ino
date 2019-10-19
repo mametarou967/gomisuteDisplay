@@ -16,6 +16,7 @@ char ssid[32] = {0};
 char password[32] = {0};
 char nowDateString[DATE_BUFF_LEN] = {0};
 char preDateString[DATE_BUFF_LEN] = {0};
+char offlineDateString[DATE_BUFF_LEN] = {0};
 bool brightHigh = false;
 
 enum FileSize{
@@ -154,7 +155,15 @@ void setup() {
   Serial.println("read end");
 
   Serial.println("get start");
-  bool result = getTermGomisuteCalendar(gomiDisplayCalendar,gomiCalendar,nowDateString,DATA_DISPLAY_RECORD_NUM);
+  bool result = false;
+  if( localConfig.GetOfflineDateActivate()){
+    Serial.println("OFFLINE DATE MODE!!!");
+    localConfig.GetOfflineDate(offlineDateString);
+    result = getTermGomisuteCalendar(gomiDisplayCalendar,gomiCalendar,offlineDateString,DATA_DISPLAY_RECORD_NUM);
+  }else{
+    Serial.println("ONLINE DATE MODE!!!");
+    result = getTermGomisuteCalendar(gomiDisplayCalendar,gomiCalendar,nowDateString,DATA_DISPLAY_RECORD_NUM);
+  }
   if(result) Serial.println("get sucess");
   Serial.println("get end");
 
