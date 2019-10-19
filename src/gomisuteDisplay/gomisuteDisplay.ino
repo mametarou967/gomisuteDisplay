@@ -18,6 +18,7 @@ char nowDateString[DATE_BUFF_LEN] = {0};
 char preDateString[DATE_BUFF_LEN] = {0};
 char offlineDateString[DATE_BUFF_LEN] = {0};
 bool brightHigh = false;
+bool buttonPushedAndSent = false;
 
 enum FileSize{
   S50X50,
@@ -198,10 +199,12 @@ void loop() {
   // ボタンを押すか、一定の距離に人が近づくとLEDを明るくする
   double distance = distanceSensor.measureDistanceCm();
   if(M5.BtnA.wasPressed() || M5.BtnB.wasPressed() || M5.BtnC.wasPressed()){
-    if(brightHigh == true){
-      // ボタンを押したとき、すでに明るい状態だった場合は何か処理させる
-      Serial.println("send?\n");
+    if(brightHigh == true && buttonPushedAndSent == false){
+      // ボタンを押したとき、すでに明るい状態だった場合は画像を更新し、IFTTT送信する
+      Serial.println("send and pic update");
+      printMainPicture(getFilePath(gomiDisplayCalendar[1].gomiShubetsu,S150X150,true),1);
       sendIfttt();
+      buttonPushedAndSent = true;
     }
     Serial.println("button pressed");
     M5.Lcd.setBrightness(90);
