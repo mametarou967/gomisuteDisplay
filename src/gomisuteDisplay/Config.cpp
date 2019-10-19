@@ -14,6 +14,8 @@ bool Config::ConfigLoad(const char *ConfiglePath){
   const char *offlineDateChar;
 
   memset(ssid,0,sizeof(ssid));
+  memset(password,0,sizeof(password));
+  memset(offlineDate,0,sizeof(offlineDate));
   
   File file = SD.open(ConfiglePath);
 
@@ -35,11 +37,11 @@ bool Config::ConfigLoad(const char *ConfiglePath){
 
   deserializeJson(doc, wifiConfig);
 
-  wifiActivate = doc["wifiActivate"];
-  Serial.printf("wifiActivate is %d \n", wifiActivate);
   ssidChar = doc["ssid"];
   Serial.printf("ssidChar is %s\n",ssidChar);
   passwordChar = doc["password"];
+  offlineDateActivate = doc["offlineDateActivate"];
+  Serial.printf("offlineDateActivate is %d \n", offlineDateActivate);
   offlineDateChar = doc["offlineDate"];
   
   memcpy(password,passwordChar,strlen(passwordChar));
@@ -47,13 +49,14 @@ bool Config::ConfigLoad(const char *ConfiglePath){
   memcpy(ssid,ssidChar,strlen(ssidChar));
   Serial.printf("ssid is %s\n",ssid);
   Serial.printf("password is %s\n",password);
+  Serial.printf("offlineDateActivate is %d \n", offlineDateActivate);
   Serial.printf("offlineDate is %s\n",offlineDate);
 
   return true;
 }
 
-bool Config::GetWifiActivate(){
-  if(wifiActivate == 0){
+bool Config::GetOfflineDateActivate(){
+  if(offlineDateActivate == 0){
     return false;
   }else{
     return true;

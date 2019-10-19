@@ -5,15 +5,15 @@
 class  Config{
   public:
     bool ConfigLoad(const char *ConfiglePath);
-    bool GetWifiActivate(void);
     void GetSsid(char *outSsid);
     void GetPassword(char *outPassword);
+    bool GetOfflineDateActivate(void);
     void GetOfflineDate(char *outOfflineDated);
     
   private:
-    int wifiActivate;
     char ssid[32];
     char password[32];
+    int offlineDateActivate;
     char offlineDate[32];
 };
 
