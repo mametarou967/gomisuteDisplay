@@ -124,6 +124,9 @@ void setup() {
   //connect to WiFi
   Serial.printf("Connecting to %s ", ssid);
   Serial.printf("password to %s ", password);
+  printPt16("network connecting",0,0,BLACK);
+  printPt16(ssid,0,16,BLACK);
+  printPt16(password,0,32,BLACK);
   WiFi.disconnect(true);
   WiFi.disconnect(true,true);
   WiFi.begin(ssid, password);
@@ -132,6 +135,10 @@ void setup() {
     Serial.print(".");
   }
   Serial.println("CONNECTED");
+  printPt16("Connected",16,64,BLACK);
+
+  delay(2000);  // 1秒
+  M5.Lcd.clear(WHITE);
 
   // NTPより時間の取得
   struct tm timeinfo;
@@ -218,7 +225,7 @@ void loop() {
   }
 
   // LEDを明るくしてから20秒後にLEDを暗くする
-  if( difftime(mktime(&timeinfo),mktime(&brightStartTime)) > 20.0 ){
+  if( difftime(mktime(&timeinfo),mktime(&brightStartTime)) > 30.0 ){
     M5.Lcd.setBrightness(1);
     brightHigh = false;
   }
